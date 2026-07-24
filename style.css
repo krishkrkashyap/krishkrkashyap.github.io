@@ -371,8 +371,8 @@ body.no-scroll { overflow: hidden; }
 .btn-projects:hover { background: var(--red); color: #fff; box-shadow: 0 0 30px var(--red-glow); }
 
 /* Contact Hub */
-.contact-hub { max-height: 0; overflow: hidden; transition: max-height 0.6s ease, opacity 0.4s ease, margin-top 0.4s ease; opacity: 0; margin-top: 0; }
-.contact-hub.active { max-height: 600px; opacity: 1; margin-top: 40px; }
+.contact-hub { max-height: 0; overflow: hidden; transition: max-height 0.8s ease, opacity 0.4s ease, margin-top 0.4s ease; opacity: 0; margin-top: 0; }
+.contact-hub.active { max-height: 2000px; opacity: 1; margin-top: 40px; }
 .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 700px; margin: 0 auto; }
 .contact-card {
   background: var(--glass); backdrop-filter: blur(12px);
