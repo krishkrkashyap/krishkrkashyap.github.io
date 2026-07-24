@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Krish Kumar — AI Engineer specializing in AI/LLM Integration, Algorithmic Trading & Quantitative Analysis. Explore my portfolio, projects, and get in touch.">
+  <title>Krish Kumar | AI Engineer — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- METEOR BACKGROUND -->
+  <div id="meteor-container"></div>
+
+  <!-- MATRIX RAIN CANVAS -->
+  <canvas id="matrix-canvas"></canvas>
+
+  <!-- TERMINAL WELCOME -->
+  <section id="terminal-section" class="terminal-section">
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="terminal-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="terminal-title">bash — KrishKrKashyap</div>
+        <div class="terminal-dots" style="visibility:hidden;">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+      <div class="terminal-body">
+        <div id="terminal-output"></div>
+        <span class="cursor" id="cursor">█</span>
+      </div>
+    </div>
+    <div class="scroll-indicator" id="scroll-indicator" style="opacity:0;">
+      <span class="scroll-text">Scroll Down</span>
+      <div class="scroll-arrow">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 13l5 5 5-5"/>
+          <path d="M7 6l5 5 5-5"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARALLAX PHOTO & DETAILS SECTION -->
+  <div id="parallax-container" class="parallax-container">
+    
+    <!-- Sticky Background/Photo Layer -->
+    <div class="sticky-photo-layer" id="sticky-photo-layer">
+      <!-- The Photo Wrapper that will animate -->
+      <div class="animating-photo" id="animating-photo">
+        <img src="assets/portrait.png" alt="Krish Kumar Portrait" class="photo-portrait" id="photo-portrait">
+        <img src="assets/full.png" alt="Krish Kumar Sitting" class="photo-full" id="photo-full">
+      </div>
+    </div>
+
+    <!-- Scrolling Content Layer -->
+    <div class="scrolling-content-layer">
+      
+      <!-- Blank space for the photo to be centered initially (100vh) -->
+      <div class="scroll-spacer"></div>
+
+      <!-- Details panel on the right side -->
+      <div class="details-panel" id="details-panel">
+        <div class="detail-block" data-detail="intro">
+          <h2 class="section-label">Who Am I</h2>
+          <h1 class="hero-name" id="hero-name"></h1>
+          <p class="hero-designation" id="hero-designation"></p>
+          <p class="hero-tagline" id="hero-tagline"></p>
+        </div>
+
+        <div class="detail-block" data-detail="bio">
+          <h2 class="section-label">About Me</h2>
+          <p class="bio-text" id="bio-text"></p>
+        </div>
+
+        <div class="detail-block" data-detail="experience">
+          <h2 class="section-label">Experience</h2>
+          <div class="experience-container" id="experience-container"></div>
+        </div>
+
+        <div class="detail-block" data-detail="roles">
+          <h2 class="section-label">What I Do</h2>
+          <ul class="roles-list" id="roles-list"></ul>
+        </div>
+
+        <div class="detail-block" data-detail="skills">
+          <h2 class="section-label">Tech Arsenal</h2>
+          <div class="skills-container" id="skills-container"></div>
+        </div>
+
+        <div class="detail-block" data-detail="achievements">
+          <h2 class="section-label">Key Achievements</h2>
+          <div class="achievements-list" id="achievements-list"></div>
+        </div>
+
+        <div class="detail-block" data-detail="certifications">
+          <h2 class="section-label">Certifications</h2>
+          <div class="certs-container" id="certs-container"></div>
+        </div>
+
+        <div class="detail-block" data-detail="education">
+          <h2 class="section-label">Education</h2>
+          <div class="education-container" id="education-container"></div>
+        </div>
+
+        <div class="detail-block" data-detail="hobbies">
+          <h2 class="section-label">Interests</h2>
+          <div class="hobbies-container" id="hobbies-container"></div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- CTA SECTION -->
+  <section id="cta-section" class="cta-section">
+    <div class="cta-content">
+      <h2 class="cta-heading">Let's Build Something<br><span class="green-text">Together</span></h2>
+      <div class="cta-buttons">
+        <button class="btn btn-contact" id="btn-contact">Get in Touch</button>
+        <button class="btn btn-projects" id="btn-projects">View Projects</button>
+      </div>
+      <div class="contact-hub" id="contact-hub">
+        <div class="contact-grid" id="contact-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS SECTION -->
+  <section id="projects-section" class="projects-section">
+    <h2 class="section-heading">
+      <span class="green-text">&lt;</span> Projects <span class="green-text">/&gt;</span>
+    </h2>
+    <div class="projects-grid" id="projects-grid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Built with <span class="green-text">💚</span> by <span class="green-text">KrishKrKashyap</span></p>
+    <p class="footer-sub">© 2026 Krish Kumar. All rights reserved.</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
