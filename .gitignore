@@ -2,3 +2,40 @@ node_modules/
 screenshot*.png
 task*.log
 *.js.map
+
+# --- added for GitHub handover: secrets ---
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.pfx
+*.p12
+*.key
+local.properties
+credentials.json
+CREDENTIALS.md
+service-account*.json
+# --- build output / caches ---
+node_modules/
+.next/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.gradle/
+.kotlin/
+build/
+app/build/
+.claude-sessions/
+# --- large/binary artefacts ---
+*.rar
+*.zip
+*.iso
+*.exe
+*.pkl
+*.sqlite3
+*.db
+*.log
+
