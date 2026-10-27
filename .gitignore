@@ -39,3 +39,19 @@ app/build/
 *.db
 *.log
 
+
+# --- agent tooling, not part of the project ---
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+.claude/
+.claude-sessions/
+.superpowers/
+.opencode/
+.qwen/
+.windsurf/
+.agents/
+.impeccable/
+.cursor/
+
