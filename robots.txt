@@ -1,0 +1,66 @@
+# robots.txt — https://krishkrkashyap.github.io/
+# Krish Kumar (krishkrkashyap) — AI Engineer, Ahmedabad, India
+
+User-agent: *
+Allow: /
+
+# Image crawlers — needed for photos to appear in Google Images
+User-agent: Googlebot-Image
+Allow: /
+Allow: /assets/
+
+User-agent: Bingbot
+Allow: /
+
+# AI / answer-engine crawlers.
+# Google-Extended governs whether Gemini and AI Overviews may ground answers
+# in this site. Allowing it is the point: it is how an AI summary gets written.
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Pinterestbot
+Allow: /
+
+Sitemap: https://krishkrkashyap.github.io/sitemap.xml

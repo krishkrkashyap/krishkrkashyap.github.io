@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://krishkrkashyap.github.io/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://krishkrkashyap.github.io/assets/krish-kumar-ai-engineer-portrait.jpg</image:loc>
+      <image:title>Krish Kumar (krishkrkashyap), AI Engineer in Ahmedabad, India — portrait</image:title>
+      <image:caption>Krish Kumar (krishkrkashyap), AI Engineer in Ahmedabad, India — portrait</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://krishkrkashyap.github.io/assets/krish-kumar-ai-engineer-full.jpg</image:loc>
+      <image:title>Krish Kumar (krishkrkashyap), AI Engineer — full portrait</image:title>
+      <image:caption>Krish Kumar (krishkrkashyap), AI Engineer — full portrait</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://krishkrkashyap.github.io/assets/krish-kumar-ai-engineer-photo.jpg</image:loc>
+      <image:title>Krish Kumar (krishkrkashyap), AI Engineer, Ahmedabad India</image:title>
+      <image:caption>Krish Kumar (krishkrkashyap), AI Engineer, Ahmedabad India</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg</image:loc>
+      <image:title>Krish Kumar — AI Engineer portfolio card</image:title>
+      <image:caption>Krish Kumar — AI Engineer portfolio card</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://krishkrkashyap.github.io/resume.html</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://krishkrkashyap.github.io/assets/krish-kumar-ai-engineer-portrait.jpg</image:loc>
+      <image:title>Krish Kumar (krishkrkashyap) — AI Engineer</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://krishkrkashyap.github.io/assets/Krish_Kumar_Resume.pdf</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
