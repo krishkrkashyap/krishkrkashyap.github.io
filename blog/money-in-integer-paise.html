@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Never store money in a float: integer paise and basis-point taxes — Krish Kumar</title>
+<meta name="description" content="Why a restaurant POS stores every amount as an integer number of paise, why tax rates are basis points rather than percentages, and the rounding rule that keeps a printed bill reconciling with the ledger.">
+<link rel="canonical" href="https://krishkrkashyap.github.io/blog/money-in-integer-paise.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Krish Kumar">
+<meta name="keywords" content="money, typescript, pos, correctness, rounding">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Never store money in a float: integer paise and basis-point taxes">
+<meta property="og:description" content="Why a restaurant POS stores every amount as an integer number of paise, why tax rates are basis points rather than percentages, and the rounding rule that keeps a printed bill reconciling with the ledger.">
+<meta property="og:url" content="https://krishkrkashyap.github.io/blog/money-in-integer-paise.html">
+<meta property="og:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<meta property="article:author" content="Krish Kumar">
+<meta property="article:published_time" content="2026-10-12">
+<meta property="article:tag" content="money">
+<meta property="article:tag" content="typescript">
+<meta property="article:tag" content="pos">
+<meta property="article:tag" content="correctness">
+<meta property="article:tag" content="rounding">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@krishkrkashyap">
+<meta name="twitter:title" content="Never store money in a float: integer paise and basis-point taxes">
+<meta name="twitter:description" content="Why a restaurant POS stores every amount as an integer number of paise, why tax rates are basis points rather than percentages, and the rounding rule that keeps a printed bill reconciling with the ledger.">
+<meta name="twitter:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Never store money in a float: integer paise and basis-point taxes",
+  "description": "Why a restaurant POS stores every amount as an integer number of paise, why tax rates are basis points rather than percentages, and the rounding rule that keeps a printed bill reconciling with the ledger.",
+  "datePublished": "2026-10-12",
+  "dateModified": "2026-10-12",
+  "keywords": "money, typescript, pos, correctness, rounding",
+  "url": "https://krishkrkashyap.github.io/blog/money-in-integer-paise.html",
+  "mainEntityOfPage": "https://krishkrkashyap.github.io/blog/money-in-integer-paise.html",
+  "image": "https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg",
+  "inLanguage": "en",
+  "author": {
+    "@type": "Person",
+    "@id": "https://krishkrkashyap.github.io/#krish-kumar",
+    "name": "Krish Kumar",
+    "alternateName": "krishkrkashyap",
+    "url": "https://krishkrkashyap.github.io/",
+    "jobTitle": "AI Engineer",
+    "sameAs": [
+      "https://github.com/krishkrkashyap",
+      "https://linkedin.com/in/krishkrkashyap",
+      "https://x.com/krishkrkashyap",
+      "https://instagram.com/krishkrkashyap",
+      "https://www.facebook.com/krishkrkashyap",
+      "https://in.pinterest.com/krishkrkashyap"
+    ]
+  },
+  "publisher": {
+    "@id": "https://krishkrkashyap.github.io/#krish-kumar"
+  }
+}
+</script>
+<style>
+  :root { --ink:#101010; --dim:#555; --line:#e2e2e2; --accent:#0a7d32; --bg:#fff; --code:#f4f4f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e8e8e8; --dim:#9a9a9a; --line:#2a2a2a; --accent:#00ff41; --bg:#0d0d0d; --code:#151515; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0 auto; max-width:740px; padding:40px 24px 96px;
+         font:17px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); }
+  nav { font-size:.86rem; margin-bottom:40px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  nav a { color:var(--dim); text-decoration:none; margin-right:18px; }
+  nav a:hover { color:var(--accent); }
+  h1 { font-size:2.05rem; line-height:1.25; letter-spacing:-.6px; margin:0 0 12px; }
+  h2 { font-size:1.26rem; margin:40px 0 12px; letter-spacing:-.2px; }
+  .meta { color:var(--dim); font-size:.88rem; margin:0 0 36px; }
+  .tags { margin-top:6px; }
+  .tags span { display:inline-block; font-size:.74rem; color:var(--dim);
+               border:1px solid var(--line); border-radius:3px; padding:1px 7px; margin:0 5px 5px 0; }
+  p { margin:0 0 17px; }
+  ul, ol { margin:0 0 17px; padding-left:22px; }
+  li { margin-bottom:7px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px;
+        padding:15px 17px; overflow-x:auto; margin:0 0 20px; }
+  code { font:14px/1.6 ui-monospace,SFMono-Regular,"Cascadia Code",Consolas,monospace; }
+  p code, li code { background:var(--code); padding:1px 5px; border-radius:3px; font-size:.88em; }
+  a { color:var(--accent); }
+  strong { font-weight:650; }
+  .postlist { list-style:none; padding:0; }
+  .postlist li { margin-bottom:30px; }
+  .postlist h2 { margin:0 0 5px; font-size:1.2rem; }
+  .postlist h2 a { text-decoration:none; }
+  .postlist p { margin:0; color:var(--dim); font-size:.94rem; }
+  .postlist .when { font-size:.8rem; color:var(--dim); }
+  footer { margin-top:70px; padding-top:22px; border-top:1px solid var(--line);
+           font-size:.86rem; color:var(--dim); }
+  footer a { color:var(--accent); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="https://krishkrkashyap.github.io/">Krish Kumar</a>
+  <a href="https://krishkrkashyap.github.io/blog/">Writing</a>
+  <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a>
+  <a href="https://github.com/krishkrkashyap">GitHub</a>
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a>
+</nav>
+<article>
+  <h1>Never store money in a float: integer paise and basis-point taxes</h1>
+  <p class="meta">
+    <time datetime="2026-10-12">12 October 2026</time>
+    · by <a href="https://krishkrkashyap.github.io/">Krish Kumar</a>
+    <span class="tags"><br><span>money</span><span>typescript</span><span>pos</span><span>correctness</span><span>rounding</span></span>
+  </p>
+<p>Every billing system I have replaced had the same bug waiting in it, and it is always
+the same bug: an amount stored as a floating-point number.</p>
+
+<p>The canonical demonstration costs one line:</p>
+
+<pre><code>0.1 + 0.2 === 0.3   // false
+0.1 + 0.2           // 0.30000000000000004</code></pre>
+
+<p>This is not a JavaScript quirk. IEEE 754 binary floating point cannot represent
+one tenth exactly, for the same reason decimal cannot represent one third exactly. Any
+language using doubles has it. The usual response is to round at the end and move on,
+and for a while that works, because a single bill is small and the error hides below the
+smallest coin.</p>
+
+<p>It stops working when you sum. A till doing a few thousand lines a day across twelve
+outlets accumulates those errors into a figure that is visible in the day's closing
+balance and impossible to explain to an accountant. The error is never large. It is
+simply unaccountable, which is worse.</p>
+
+<h2>Store the smallest unit as an integer</h2>
+
+<p>In <code>k-pos</code>, the offline-first POS I built to replace a paid SaaS till, no
+amount is ever a decimal. Every amount is an integer count of <strong>paise</strong> —
+the smallest unit of Indian currency, one hundredth of a rupee.</p>
+
+<pre><code>// ₹249.50 is not 249.50
+const price = 24950;  // paise, always an integer</code></pre>
+
+<p>Integers add and multiply exactly. A sum of ten thousand integer line amounts is
+exact. The rendering layer divides by 100 once, at the very last moment, purely to put
+a string in front of a human. Nothing downstream of that string is ever read back as a
+number.</p>
+
+<p>SQLite made this easy to enforce: the column is <code>INTEGER</code>, so a decimal
+cannot be written even by accident. A schema constraint is worth more than a convention,
+because the convention only holds while everybody remembers it.</p>
+
+<h2>Tax rates are basis points, not percentages</h2>
+
+<p>The same reasoning applies one level up. GST in India is 5%, 12%, 18% — but a
+restaurant also deals with per-item cess and composite rates that are not whole numbers.
+Storing <code>0.05</code> as a rate reintroduces exactly the problem we just removed.</p>
+
+<p>So rates are stored in <strong>basis points</strong>: one basis point is one
+hundredth of one percent.</p>
+
+<pre><code>// 5% = 500 bp, 18% = 1800 bp, 2.5% = 250 bp
+const GST_5  = 500;
+const GST_18 = 1800;
+
+function taxOn(amountPaise: number, rateBp: number): number {
+  // multiply first, divide last — never the reverse
+  return Math.round((amountPaise * rateBp) / 10_000);
+}</code></pre>
+
+<p>The ordering in that function is the whole point. <code>amount * rate / 10000</code>
+keeps full integer precision until the single division. <code>amount * (rate / 10000)</code>
+computes a float first and hands you back the problem you were avoiding.</p>
+
+<h2>Round once, and define which way</h2>
+
+<p>There is exactly one rounding step, in <code>taxOn</code>, and it needs a stated
+rule. I use half-up, because that is what the tax authority's own worked examples use,
+and because a bill that disagrees with the inspector's arithmetic is a conversation you
+do not want to have.</p>
+
+<p>Banker's rounding — half-to-even — is better for statistical neutrality over very
+large sample sizes. It is the wrong choice here. Matching the regulator beats matching
+the textbook.</p>
+
+<p>The rule that matters more than which rounding you pick: <strong>round once</strong>.
+If tax is rounded per line and the lines are then summed, the bill total can differ from
+tax computed on the order total. Both numbers are defensible, they are just not equal,
+and whichever one you print is the one you must store. I round per line, because that
+is what appears on the printed bill, and the stored total is the sum of the stored
+lines. The invariant is that the ledger reproduces the paper.</p>
+
+<h2>Price snapshots</h2>
+
+<p>One more thing that looks unrelated and is not. An order line does not hold a
+foreign key to the current price of an item. It holds a <em>copy</em> of the price at
+the moment the line was created.</p>
+
+<p>If it held a reference, then raising the price of a samosa tomorrow would silently
+rewrite every historical bill that contained one. Last month's sales report would change
+value every time the menu changed. I have seen this in production systems and the
+symptom is always the same: a report that was correct on Monday is different on Friday,
+and nobody can say why.</p>
+
+<p>Snapshot the price. The storage cost is a few bytes per line. The alternative is a
+ledger that is not a ledger.</p>
+
+<h2>What this buys</h2>
+
+<p>None of this is clever. It is a set of boring decisions taken early:</p>
+
+<ul>
+  <li>integers in the smallest unit, enforced by the column type</li>
+  <li>rates as basis points, multiply before you divide</li>
+  <li>one rounding step, half-up, documented</li>
+  <li>prices copied into the order, never referenced</li>
+</ul>
+
+<p>The payoff is that the day's totals reconcile exactly, every day, without anyone
+needing to investigate a two-rupee discrepancy. In a system handling money, "exactly"
+is the only acceptable tolerance — not because two rupees matters, but because an
+unexplained two rupees means you do not know what your system is doing.</p>
+</article>
+<footer>
+  <p>Written by <strong>Krish Kumar</strong> (krishkrkashyap) — AI Engineer in
+  Ahmedabad, Gujarat, India. I build applied LLM systems, agent
+  architectures and the backends they run on.</p>
+  <p><a href="https://krishkrkashyap.github.io/">Portfolio</a> · <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a> ·
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a> · <a href="https://github.com/krishkrkashyap">GitHub</a> ·
+  <a href="mailto:krishkrkashyap@gmail.com">krishkrkashyap@gmail.com</a></p>
+</footer>
+</body>
+</html>

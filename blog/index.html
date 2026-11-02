@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing — Krish Kumar (krishkrkashyap), AI Engineer</title>
+<meta name="description" content="Engineering notes by Krish Kumar (krishkrkashyap) — applied LLM systems, MCP servers, agent architecture, correctness in money and data paths.">
+<link rel="canonical" href="https://krishkrkashyap.github.io/blog/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Krish Kumar">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Writing — Krish Kumar, AI Engineer">
+<meta property="og:description" content="Engineering notes on applied LLM systems, agent architecture and correctness in money and data paths.">
+<meta property="og:url" content="https://krishkrkashyap.github.io/blog/">
+<meta property="og:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Krish Kumar — Writing",
+  "url": "https://krishkrkashyap.github.io/blog/",
+  "description": "Engineering notes on applied LLM systems, agent architecture, correctness in money and data paths.",
+  "author": {
+    "@id": "https://krishkrkashyap.github.io/#krish-kumar"
+  },
+  "blogPost": [
+    {
+      "@type": "BlogPosting",
+      "headline": "Never store money in a float: integer paise and basis-point taxes",
+      "url": "https://krishkrkashyap.github.io/blog/money-in-integer-paise.html",
+      "datePublished": "2026-10-12",
+      "author": {
+        "@id": "https://krishkrkashyap.github.io/#krish-kumar"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "headline": "Putting a Model Context Protocol server over a commercial POS",
+      "url": "https://krishkrkashyap.github.io/blog/mcp-server-over-a-pos.html",
+      "datePublished": "2026-09-28",
+      "author": {
+        "@id": "https://krishkrkashyap.github.io/#krish-kumar"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "headline": "A margin audit, and the leak that was not in the data",
+      "url": "https://krishkrkashyap.github.io/blog/the-leak-that-was-not-in-the-data.html",
+      "datePublished": "2026-09-05",
+      "author": {
+        "@id": "https://krishkrkashyap.github.io/#krish-kumar"
+      }
+    }
+  ]
+}
+</script>
+<style>
+  :root { --ink:#101010; --dim:#555; --line:#e2e2e2; --accent:#0a7d32; --bg:#fff; --code:#f4f4f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e8e8e8; --dim:#9a9a9a; --line:#2a2a2a; --accent:#00ff41; --bg:#0d0d0d; --code:#151515; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0 auto; max-width:740px; padding:40px 24px 96px;
+         font:17px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); }
+  nav { font-size:.86rem; margin-bottom:40px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  nav a { color:var(--dim); text-decoration:none; margin-right:18px; }
+  nav a:hover { color:var(--accent); }
+  h1 { font-size:2.05rem; line-height:1.25; letter-spacing:-.6px; margin:0 0 12px; }
+  h2 { font-size:1.26rem; margin:40px 0 12px; letter-spacing:-.2px; }
+  .meta { color:var(--dim); font-size:.88rem; margin:0 0 36px; }
+  .tags { margin-top:6px; }
+  .tags span { display:inline-block; font-size:.74rem; color:var(--dim);
+               border:1px solid var(--line); border-radius:3px; padding:1px 7px; margin:0 5px 5px 0; }
+  p { margin:0 0 17px; }
+  ul, ol { margin:0 0 17px; padding-left:22px; }
+  li { margin-bottom:7px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px;
+        padding:15px 17px; overflow-x:auto; margin:0 0 20px; }
+  code { font:14px/1.6 ui-monospace,SFMono-Regular,"Cascadia Code",Consolas,monospace; }
+  p code, li code { background:var(--code); padding:1px 5px; border-radius:3px; font-size:.88em; }
+  a { color:var(--accent); }
+  strong { font-weight:650; }
+  .postlist { list-style:none; padding:0; }
+  .postlist li { margin-bottom:30px; }
+  .postlist h2 { margin:0 0 5px; font-size:1.2rem; }
+  .postlist h2 a { text-decoration:none; }
+  .postlist p { margin:0; color:var(--dim); font-size:.94rem; }
+  .postlist .when { font-size:.8rem; color:var(--dim); }
+  footer { margin-top:70px; padding-top:22px; border-top:1px solid var(--line);
+           font-size:.86rem; color:var(--dim); }
+  footer a { color:var(--accent); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="https://krishkrkashyap.github.io/">Krish Kumar</a>
+  <a href="https://krishkrkashyap.github.io/blog/">Writing</a>
+  <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a>
+  <a href="https://github.com/krishkrkashyap">GitHub</a>
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a>
+</nav>
+<h1>Writing</h1>
+<p class="meta">Engineering notes by Krish Kumar — AI Engineer, Ahmedabad.</p>
+<ul class="postlist">
+    <li>
+      <h2><a href="money-in-integer-paise.html">Never store money in a float: integer paise and basis-point taxes</a></h2>
+      <p class="when">12 October 2026</p>
+      <p>Why a restaurant POS stores every amount as an integer number of paise, why tax rates are basis points rather than percentages, and the rounding rule that keeps a printed bill reconciling with the ledger.</p>
+    </li>
+    <li>
+      <h2><a href="mcp-server-over-a-pos.html">Putting a Model Context Protocol server over a commercial POS</a></h2>
+      <p class="when">28 September 2026</p>
+      <p>How exposing a point-of-sale platform as schema-validated MCP tools replaced a drawer full of one-off analysis scripts, and what the tool boundary has to look like for a model to use it safely.</p>
+    </li>
+    <li>
+      <h2><a href="the-leak-that-was-not-in-the-data.html">A margin audit, and the leak that was not in the data</a></h2>
+      <p class="when">5 September 2026</p>
+      <p>A year of restaurant transaction data through a staged pandas pipeline. The price integrity was high, the discounting was clean, and the real finding was a category of transaction that no control was watching at all.</p>
+    </li>
+</ul>
+<footer>
+  <p>Written by <strong>Krish Kumar</strong> (krishkrkashyap) — AI Engineer in
+  Ahmedabad, Gujarat, India. I build applied LLM systems, agent
+  architectures and the backends they run on.</p>
+  <p><a href="https://krishkrkashyap.github.io/">Portfolio</a> · <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a> ·
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a> · <a href="https://github.com/krishkrkashyap">GitHub</a> ·
+  <a href="mailto:krishkrkashyap@gmail.com">krishkrkashyap@gmail.com</a></p>
+</footer>
+</body>
+</html>

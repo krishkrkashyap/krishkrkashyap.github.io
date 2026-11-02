@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A margin audit, and the leak that was not in the data — Krish Kumar</title>
+<meta name="description" content="A year of restaurant transaction data through a staged pandas pipeline. The price integrity was high, the discounting was clean, and the real finding was a category of transaction that no control was watching at all.">
+<link rel="canonical" href="https://krishkrkashyap.github.io/blog/the-leak-that-was-not-in-the-data.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Krish Kumar">
+<meta name="keywords" content="data-engineering, pandas, forensics, audit, parquet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A margin audit, and the leak that was not in the data">
+<meta property="og:description" content="A year of restaurant transaction data through a staged pandas pipeline. The price integrity was high, the discounting was clean, and the real finding was a category of transaction that no control was watching at all.">
+<meta property="og:url" content="https://krishkrkashyap.github.io/blog/the-leak-that-was-not-in-the-data.html">
+<meta property="og:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<meta property="article:author" content="Krish Kumar">
+<meta property="article:published_time" content="2026-09-05">
+<meta property="article:tag" content="data-engineering">
+<meta property="article:tag" content="pandas">
+<meta property="article:tag" content="forensics">
+<meta property="article:tag" content="audit">
+<meta property="article:tag" content="parquet">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@krishkrkashyap">
+<meta name="twitter:title" content="A margin audit, and the leak that was not in the data">
+<meta name="twitter:description" content="A year of restaurant transaction data through a staged pandas pipeline. The price integrity was high, the discounting was clean, and the real finding was a category of transaction that no control was watching at all.">
+<meta name="twitter:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "A margin audit, and the leak that was not in the data",
+  "description": "A year of restaurant transaction data through a staged pandas pipeline. The price integrity was high, the discounting was clean, and the real finding was a category of transaction that no control was watching at all.",
+  "datePublished": "2026-09-05",
+  "dateModified": "2026-09-05",
+  "keywords": "data-engineering, pandas, forensics, audit, parquet",
+  "url": "https://krishkrkashyap.github.io/blog/the-leak-that-was-not-in-the-data.html",
+  "mainEntityOfPage": "https://krishkrkashyap.github.io/blog/the-leak-that-was-not-in-the-data.html",
+  "image": "https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg",
+  "inLanguage": "en",
+  "author": {
+    "@type": "Person",
+    "@id": "https://krishkrkashyap.github.io/#krish-kumar",
+    "name": "Krish Kumar",
+    "alternateName": "krishkrkashyap",
+    "url": "https://krishkrkashyap.github.io/",
+    "jobTitle": "AI Engineer",
+    "sameAs": [
+      "https://github.com/krishkrkashyap",
+      "https://linkedin.com/in/krishkrkashyap",
+      "https://x.com/krishkrkashyap",
+      "https://instagram.com/krishkrkashyap",
+      "https://www.facebook.com/krishkrkashyap",
+      "https://in.pinterest.com/krishkrkashyap"
+    ]
+  },
+  "publisher": {
+    "@id": "https://krishkrkashyap.github.io/#krish-kumar"
+  }
+}
+</script>
+<style>
+  :root { --ink:#101010; --dim:#555; --line:#e2e2e2; --accent:#0a7d32; --bg:#fff; --code:#f4f4f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e8e8e8; --dim:#9a9a9a; --line:#2a2a2a; --accent:#00ff41; --bg:#0d0d0d; --code:#151515; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0 auto; max-width:740px; padding:40px 24px 96px;
+         font:17px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); }
+  nav { font-size:.86rem; margin-bottom:40px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  nav a { color:var(--dim); text-decoration:none; margin-right:18px; }
+  nav a:hover { color:var(--accent); }
+  h1 { font-size:2.05rem; line-height:1.25; letter-spacing:-.6px; margin:0 0 12px; }
+  h2 { font-size:1.26rem; margin:40px 0 12px; letter-spacing:-.2px; }
+  .meta { color:var(--dim); font-size:.88rem; margin:0 0 36px; }
+  .tags { margin-top:6px; }
+  .tags span { display:inline-block; font-size:.74rem; color:var(--dim);
+               border:1px solid var(--line); border-radius:3px; padding:1px 7px; margin:0 5px 5px 0; }
+  p { margin:0 0 17px; }
+  ul, ol { margin:0 0 17px; padding-left:22px; }
+  li { margin-bottom:7px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px;
+        padding:15px 17px; overflow-x:auto; margin:0 0 20px; }
+  code { font:14px/1.6 ui-monospace,SFMono-Regular,"Cascadia Code",Consolas,monospace; }
+  p code, li code { background:var(--code); padding:1px 5px; border-radius:3px; font-size:.88em; }
+  a { color:var(--accent); }
+  strong { font-weight:650; }
+  .postlist { list-style:none; padding:0; }
+  .postlist li { margin-bottom:30px; }
+  .postlist h2 { margin:0 0 5px; font-size:1.2rem; }
+  .postlist h2 a { text-decoration:none; }
+  .postlist p { margin:0; color:var(--dim); font-size:.94rem; }
+  .postlist .when { font-size:.8rem; color:var(--dim); }
+  footer { margin-top:70px; padding-top:22px; border-top:1px solid var(--line);
+           font-size:.86rem; color:var(--dim); }
+  footer a { color:var(--accent); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="https://krishkrkashyap.github.io/">Krish Kumar</a>
+  <a href="https://krishkrkashyap.github.io/blog/">Writing</a>
+  <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a>
+  <a href="https://github.com/krishkrkashyap">GitHub</a>
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a>
+</nav>
+<article>
+  <h1>A margin audit, and the leak that was not in the data</h1>
+  <p class="meta">
+    <time datetime="2026-09-05">5 September 2026</time>
+    · by <a href="https://krishkrkashyap.github.io/">Krish Kumar</a>
+    <span class="tags"><br><span>data-engineering</span><span>pandas</span><span>forensics</span><span>audit</span><span>parquet</span></span>
+  </p>
+<p>I was asked a narrow question: where is the margin going? Twelve outlets, a year of
+transactions, and a gross margin that did not match what the menu costing said it should
+be.</p>
+
+<p>The assumption going in — mine as much as anyone's — was that the answer would be
+discounting. It usually is. Someone is giving away too much, and once you quantify it
+you tighten the policy and recover the difference.</p>
+
+<p>That is not what the data said.</p>
+
+<h2>The pipeline</h2>
+
+<p>A year of line-item data across twelve outlets is not large by any serious standard,
+but it is large enough that iterating on a CSV is miserable. The pipeline is staged, and
+each stage writes Parquet:</p>
+
+<pre><code>raw/       immutable export, never touched again
+clean/     typed, deduplicated, canonical outlet and item names
+joined/    lines joined to costing and category masters
+features/  per-line margin, discount, void and modifier flags</code></pre>
+
+<p>Each stage reads the previous one and writes a new directory. Nothing mutates in
+place. When — not if — a mapping turns out to be wrong, you fix that stage and re-run
+forward, and you still have the original to prove what the source actually said.</p>
+
+<p>Parquet rather than CSV for the obvious reason: columnar, typed, and about a tenth of
+the size, so a stage re-runs in seconds and you stay willing to re-run it. A slow
+pipeline quietly discourages you from checking your own work.</p>
+
+<p>The canonicalisation stage was the one that mattered most and looked least
+interesting. The same item was spelled four ways across outlets. Until those collapse
+into one name, every aggregate downstream is wrong in a way that is invisible — it does
+not error, it just under-counts.</p>
+
+<h2>What came back clean</h2>
+
+<p>Price integrity at the till was high. The price charged matched the price on the menu
+in the overwhelming majority of lines, and the exceptions were explainable — genuine
+authorised overrides, concentrated in a small number of shifts.</p>
+
+<p>Discounting was within policy. Voids were unremarkable. Wastage was real but roughly
+what the kitchen already believed it to be.</p>
+
+<p>Each of these was a hypothesis, and each came back negative. That is a result, and it
+is worth stating plainly rather than quietly moving on, because "we checked and it is
+fine" is information the business did not previously have about its own controls.</p>
+
+<h2>The finding</h2>
+
+<p>The leakage was not in any of the categories anyone was watching. It was in a class of
+transaction that <strong>no control existed for at all</strong> — not a control that was
+failing, a control that had never been written. It did not appear in any report, because
+no report had a line for it. It was not an exception, because nothing had defined it as
+one.</p>
+
+<p>The reason it took a full pipeline to find is that it was invisible in aggregate. At
+the level anybody normally looks — daily totals per outlet — it is a rounding error. It
+only becomes visible when you have every line for a year in one place and go looking for
+transaction shapes that no rule covers.</p>
+
+<p>I am not going to detail the mechanism, because it is a live operational matter for
+the business. The transferable part is the method, and it is this: <strong>auditing the
+controls you have will never find the thing you have no control for.</strong> You have
+to enumerate transaction types from the data itself and then ask which of them anything
+is actually watching. The gap is the finding.</p>
+
+<h2>Shipping a finding, not a report</h2>
+
+<p>The thing I would do differently in every previous analysis I have written: do not
+stop at the number.</p>
+
+<p>A document saying "approximately this much is leaking through this mechanism" is
+read, agreed with, and filed. Nothing changes, because nobody was given anything to
+run.</p>
+
+<p>So the deliverable was three things:</p>
+
+<ol>
+  <li>the quantified finding, with the method written out so it can be challenged</li>
+  <li>a monitoring specification — what to watch, at what threshold, and who sees it</li>
+  <li>a runnable control script implementing that specification against live data</li>
+</ol>
+
+<p>The third item is what makes the first two matter. An audit that ends in a PDF
+describes a problem once. An audit that ends in a script that runs every week is a
+control, and the next instance gets caught in days rather than in next year's audit.</p>
+
+<h2>The general version</h2>
+
+<p>Stage your pipeline and keep every stage on disk. Canonicalise before you aggregate,
+or your aggregates lie quietly. State your negative results — proving the controls work
+is a finding. And finish by handing over something that runs, not something that is
+read.</p>
+</article>
+<footer>
+  <p>Written by <strong>Krish Kumar</strong> (krishkrkashyap) — AI Engineer in
+  Ahmedabad, Gujarat, India. I build applied LLM systems, agent
+  architectures and the backends they run on.</p>
+  <p><a href="https://krishkrkashyap.github.io/">Portfolio</a> · <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a> ·
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a> · <a href="https://github.com/krishkrkashyap">GitHub</a> ·
+  <a href="mailto:krishkrkashyap@gmail.com">krishkrkashyap@gmail.com</a></p>
+</footer>
+</body>
+</html>

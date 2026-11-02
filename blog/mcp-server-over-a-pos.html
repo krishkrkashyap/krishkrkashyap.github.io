@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Putting a Model Context Protocol server over a commercial POS — Krish Kumar</title>
+<meta name="description" content="How exposing a point-of-sale platform as schema-validated MCP tools replaced a drawer full of one-off analysis scripts, and what the tool boundary has to look like for a model to use it safely.">
+<link rel="canonical" href="https://krishkrkashyap.github.io/blog/mcp-server-over-a-pos.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Krish Kumar">
+<meta name="keywords" content="mcp, llm, ai-agents, python, pos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Putting a Model Context Protocol server over a commercial POS">
+<meta property="og:description" content="How exposing a point-of-sale platform as schema-validated MCP tools replaced a drawer full of one-off analysis scripts, and what the tool boundary has to look like for a model to use it safely.">
+<meta property="og:url" content="https://krishkrkashyap.github.io/blog/mcp-server-over-a-pos.html">
+<meta property="og:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<meta property="article:author" content="Krish Kumar">
+<meta property="article:published_time" content="2026-09-28">
+<meta property="article:tag" content="mcp">
+<meta property="article:tag" content="llm">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="pos">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@krishkrkashyap">
+<meta name="twitter:title" content="Putting a Model Context Protocol server over a commercial POS">
+<meta name="twitter:description" content="How exposing a point-of-sale platform as schema-validated MCP tools replaced a drawer full of one-off analysis scripts, and what the tool boundary has to look like for a model to use it safely.">
+<meta name="twitter:image" content="https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Putting a Model Context Protocol server over a commercial POS",
+  "description": "How exposing a point-of-sale platform as schema-validated MCP tools replaced a drawer full of one-off analysis scripts, and what the tool boundary has to look like for a model to use it safely.",
+  "datePublished": "2026-09-28",
+  "dateModified": "2026-09-28",
+  "keywords": "mcp, llm, ai-agents, python, pos",
+  "url": "https://krishkrkashyap.github.io/blog/mcp-server-over-a-pos.html",
+  "mainEntityOfPage": "https://krishkrkashyap.github.io/blog/mcp-server-over-a-pos.html",
+  "image": "https://krishkrkashyap.github.io/assets/krish-kumar-og-card.jpg",
+  "inLanguage": "en",
+  "author": {
+    "@type": "Person",
+    "@id": "https://krishkrkashyap.github.io/#krish-kumar",
+    "name": "Krish Kumar",
+    "alternateName": "krishkrkashyap",
+    "url": "https://krishkrkashyap.github.io/",
+    "jobTitle": "AI Engineer",
+    "sameAs": [
+      "https://github.com/krishkrkashyap",
+      "https://linkedin.com/in/krishkrkashyap",
+      "https://x.com/krishkrkashyap",
+      "https://instagram.com/krishkrkashyap",
+      "https://www.facebook.com/krishkrkashyap",
+      "https://in.pinterest.com/krishkrkashyap"
+    ]
+  },
+  "publisher": {
+    "@id": "https://krishkrkashyap.github.io/#krish-kumar"
+  }
+}
+</script>
+<style>
+  :root { --ink:#101010; --dim:#555; --line:#e2e2e2; --accent:#0a7d32; --bg:#fff; --code:#f4f4f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e8e8e8; --dim:#9a9a9a; --line:#2a2a2a; --accent:#00ff41; --bg:#0d0d0d; --code:#151515; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0 auto; max-width:740px; padding:40px 24px 96px;
+         font:17px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); }
+  nav { font-size:.86rem; margin-bottom:40px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  nav a { color:var(--dim); text-decoration:none; margin-right:18px; }
+  nav a:hover { color:var(--accent); }
+  h1 { font-size:2.05rem; line-height:1.25; letter-spacing:-.6px; margin:0 0 12px; }
+  h2 { font-size:1.26rem; margin:40px 0 12px; letter-spacing:-.2px; }
+  .meta { color:var(--dim); font-size:.88rem; margin:0 0 36px; }
+  .tags { margin-top:6px; }
+  .tags span { display:inline-block; font-size:.74rem; color:var(--dim);
+               border:1px solid var(--line); border-radius:3px; padding:1px 7px; margin:0 5px 5px 0; }
+  p { margin:0 0 17px; }
+  ul, ol { margin:0 0 17px; padding-left:22px; }
+  li { margin-bottom:7px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px;
+        padding:15px 17px; overflow-x:auto; margin:0 0 20px; }
+  code { font:14px/1.6 ui-monospace,SFMono-Regular,"Cascadia Code",Consolas,monospace; }
+  p code, li code { background:var(--code); padding:1px 5px; border-radius:3px; font-size:.88em; }
+  a { color:var(--accent); }
+  strong { font-weight:650; }
+  .postlist { list-style:none; padding:0; }
+  .postlist li { margin-bottom:30px; }
+  .postlist h2 { margin:0 0 5px; font-size:1.2rem; }
+  .postlist h2 a { text-decoration:none; }
+  .postlist p { margin:0; color:var(--dim); font-size:.94rem; }
+  .postlist .when { font-size:.8rem; color:var(--dim); }
+  footer { margin-top:70px; padding-top:22px; border-top:1px solid var(--line);
+           font-size:.86rem; color:var(--dim); }
+  footer a { color:var(--accent); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="https://krishkrkashyap.github.io/">Krish Kumar</a>
+  <a href="https://krishkrkashyap.github.io/blog/">Writing</a>
+  <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a>
+  <a href="https://github.com/krishkrkashyap">GitHub</a>
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a>
+</nav>
+<article>
+  <h1>Putting a Model Context Protocol server over a commercial POS</h1>
+  <p class="meta">
+    <time datetime="2026-09-28">28 September 2026</time>
+    · by <a href="https://krishkrkashyap.github.io/">Krish Kumar</a>
+    <span class="tags"><br><span>mcp</span><span>llm</span><span>ai-agents</span><span>python</span><span>pos</span></span>
+  </p>
+<p>Before this, answering a question about the business meant writing a script. "Which
+outlet is losing the most on wastage this quarter" was twenty minutes of pulling the POS
+API, reshaping it in pandas, and printing a table. The script was then thrown away,
+because the next question was slightly different.</p>
+
+<p>That is an enormous amount of work to answer a question that a person could ask in
+one sentence. So I built a <strong>Model Context Protocol server</strong> over the
+Petpooja POS cloud, and now the question <em>is</em> the one sentence.</p>
+
+<h2>What MCP actually is</h2>
+
+<p>MCP is a protocol for handing a model a set of callable tools, each with a declared
+JSON schema for its arguments and its return shape. The model does not see your API. It
+sees a menu of named operations with typed parameters, and it picks one.</p>
+
+<p>The interesting part is not the plumbing — the SDK handles that. The interesting part
+is <strong>where you draw the tool boundary</strong>, because that decision determines
+whether the model is useful or dangerous.</p>
+
+<h2>Wrong boundary: mirror the REST API</h2>
+
+<p>My first attempt exposed the POS endpoints roughly one-to-one. Fourteen endpoints
+became fourteen tools. It worked, in the sense that calls succeeded, and it was close to
+useless.</p>
+
+<p>The model would fetch a raw order list, get back several thousand records, and then
+try to reason about them in the context window. It ran out of room, and the arithmetic it
+did on the records it could see was arithmetic a database should have done. A model is a
+bad place to do a <code>GROUP BY</code>.</p>
+
+<h2>Right boundary: expose the questions, not the endpoints</h2>
+
+<p>The tools that work are shaped like the questions people actually ask:</p>
+
+<pre><code>sales_by_outlet(date_from, date_to, segment=None)
+wastage_summary(outlet_id, period)
+item_movement(item_name, outlet_id=None, period="30d")
+price_variance(outlet_id, period)
+stock_on_hand(outlet_id, category=None)</code></pre>
+
+<p>Each one does its aggregation in PostgreSQL and returns tens of rows, not thousands.
+The model receives a small, already-correct result and spends its effort on
+interpretation, which is the part it is genuinely good at.</p>
+
+<p>This is the whole lesson, and it transfers to any agent you build:
+<strong>a tool should return an answer, not a dataset.</strong> If the model has to
+aggregate what you handed back, you drew the boundary one level too low.</p>
+
+<h2>Schemas are a safety mechanism, not documentation</h2>
+
+<p>Every argument is validated before anything executes. <code>outlet_id</code> must be
+an integer that exists. <code>period</code> must match a known pattern. Dates must
+parse, and the range cannot exceed a year.</p>
+
+<p>This matters more than it does in ordinary code, because the caller is a language
+model and a language model will confidently pass <code>outlet_id="the Prahlad Nagar
+one"</code>. With a schema that is a clean validation error the model can read and
+correct in one turn. Without one it is a confusing 500 from a vendor API, or worse, a
+query that silently returns nothing and gets reported as "no wastage this quarter".</p>
+
+<p>A tool that fails loudly is a tool a model can use. A tool that fails quietly is how
+you get a confidently wrong answer in front of a business owner.</p>
+
+<h2>Read-only, deliberately</h2>
+
+<p>Every tool on this server reads. None of them writes. No tool voids a bill, adjusts
+stock, or changes a price.</p>
+
+<p>That was not a technical limitation and it would not have been hard to add. It is
+that the value here is entirely in the asking, and the risk of a write path is entirely
+asymmetric. The upside of "the model can also fix it" is small; the downside of a model
+confidently adjusting stock on a misparsed instruction is a corrupted inventory ledger
+that someone has to reconstruct by hand.</p>
+
+<p>When write operations do become worth it, they go behind an explicit human approval
+step — the model drafts the mutation, a person confirms it, and only then does it
+execute. I use exactly that pattern in a vendor-payment bot elsewhere in the estate: it
+drafts the message from the bank statement, and a human presses send.</p>
+
+<h2>What changed</h2>
+
+<p>The scripts are gone. Questions that used to cost twenty minutes cost one sentence,
+and — more useful than the speed — people now ask questions they previously would not
+have bothered to ask, because the cost of asking fell to roughly zero.</p>
+
+<p>That is the actual return on an MCP server. Not that it answers faster, but that it
+changes which questions are worth asking.</p>
+</article>
+<footer>
+  <p>Written by <strong>Krish Kumar</strong> (krishkrkashyap) — AI Engineer in
+  Ahmedabad, Gujarat, India. I build applied LLM systems, agent
+  architectures and the backends they run on.</p>
+  <p><a href="https://krishkrkashyap.github.io/">Portfolio</a> · <a href="https://krishkrkashyap.github.io/resume.html">Résumé</a> ·
+  <a href="https://linkedin.com/in/krishkrkashyap">LinkedIn</a> · <a href="https://github.com/krishkrkashyap">GitHub</a> ·
+  <a href="mailto:krishkrkashyap@gmail.com">krishkrkashyap@gmail.com</a></p>
+</footer>
+</body>
+</html>

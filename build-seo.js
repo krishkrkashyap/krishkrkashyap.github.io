@@ -16,6 +16,10 @@ const D = new Function(
   fs.readFileSync(path.join(__dirname, 'data.js'), 'utf8') + ';return PORTFOLIO_DATA;'
 )();
 
+const POSTS = new Function(
+  fs.readFileSync(path.join(__dirname, 'posts.js'), 'utf8') + ';return POSTS;'
+)().slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+
 const SITE = D.siteUrl.replace(/\/$/, '');
 const TODAY = new Date().toISOString().slice(0, 10);
 
@@ -209,6 +213,191 @@ ${certHtml}
 `;
 }
 
+// ── blog ───────────────────────────────────────────────────────
+const PAGE_CSS = `
+  :root { --ink:#101010; --dim:#555; --line:#e2e2e2; --accent:#0a7d32; --bg:#fff; --code:#f4f4f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink:#e8e8e8; --dim:#9a9a9a; --line:#2a2a2a; --accent:#00ff41; --bg:#0d0d0d; --code:#151515; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0 auto; max-width:740px; padding:40px 24px 96px;
+         font:17px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+         color:var(--ink); background:var(--bg); }
+  nav { font-size:.86rem; margin-bottom:40px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+  nav a { color:var(--dim); text-decoration:none; margin-right:18px; }
+  nav a:hover { color:var(--accent); }
+  h1 { font-size:2.05rem; line-height:1.25; letter-spacing:-.6px; margin:0 0 12px; }
+  h2 { font-size:1.26rem; margin:40px 0 12px; letter-spacing:-.2px; }
+  .meta { color:var(--dim); font-size:.88rem; margin:0 0 36px; }
+  .tags { margin-top:6px; }
+  .tags span { display:inline-block; font-size:.74rem; color:var(--dim);
+               border:1px solid var(--line); border-radius:3px; padding:1px 7px; margin:0 5px 5px 0; }
+  p { margin:0 0 17px; }
+  ul, ol { margin:0 0 17px; padding-left:22px; }
+  li { margin-bottom:7px; }
+  pre { background:var(--code); border:1px solid var(--line); border-radius:6px;
+        padding:15px 17px; overflow-x:auto; margin:0 0 20px; }
+  code { font:14px/1.6 ui-monospace,SFMono-Regular,"Cascadia Code",Consolas,monospace; }
+  p code, li code { background:var(--code); padding:1px 5px; border-radius:3px; font-size:.88em; }
+  a { color:var(--accent); }
+  strong { font-weight:650; }
+  .postlist { list-style:none; padding:0; }
+  .postlist li { margin-bottom:30px; }
+  .postlist h2 { margin:0 0 5px; font-size:1.2rem; }
+  .postlist h2 a { text-decoration:none; }
+  .postlist p { margin:0; color:var(--dim); font-size:.94rem; }
+  .postlist .when { font-size:.8rem; color:var(--dim); }
+  footer { margin-top:70px; padding-top:22px; border-top:1px solid var(--line);
+           font-size:.86rem; color:var(--dim); }
+  footer a { color:var(--accent); }
+`;
+
+const NAV = `<nav>
+  <a href="${SITE}/">Krish Kumar</a>
+  <a href="${SITE}/blog/">Writing</a>
+  <a href="${SITE}/resume.html">Résumé</a>
+  <a href="${D.contact.github}">GitHub</a>
+  <a href="${D.contact.linkedin}">LinkedIn</a>
+</nav>`;
+
+const FOOTER = `<footer>
+  <p>Written by <strong>Krish Kumar</strong> (${esc(D.handle)}) — ${esc(D.jobTitle)} in
+  ${esc(D.addressLocality)}, Gujarat, India. I build applied LLM systems, agent
+  architectures and the backends they run on.</p>
+  <p><a href="${SITE}/">Portfolio</a> · <a href="${SITE}/resume.html">Résumé</a> ·
+  <a href="${D.contact.linkedin}">LinkedIn</a> · <a href="${D.contact.github}">GitHub</a> ·
+  <a href="mailto:${esc(D.contact.email)}">${esc(D.contact.email)}</a></p>
+</footer>`;
+
+function buildPost(p) {
+  const jsonld = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: p.title,
+    description: p.description,
+    datePublished: p.date,
+    dateModified: p.date,
+    keywords: p.tags.join(', '),
+    url: `${SITE}/blog/${p.slug}.html`,
+    mainEntityOfPage: `${SITE}/blog/${p.slug}.html`,
+    image: `${SITE}/assets/krish-kumar-og-card.jpg`,
+    inLanguage: 'en',
+    author: {
+      '@type': 'Person',
+      '@id': `${SITE}/#krish-kumar`,
+      name: D.name,
+      alternateName: D.handle,
+      url: `${SITE}/`,
+      jobTitle: D.jobTitle,
+      sameAs: socials,
+    },
+    publisher: { '@id': `${SITE}/#krish-kumar` },
+  };
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${esc(p.title)} — Krish Kumar</title>
+<meta name="description" content="${esc(p.description)}">
+<link rel="canonical" href="${SITE}/blog/${p.slug}.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="${esc(D.name)}">
+<meta name="keywords" content="${esc(p.tags.join(', '))}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="${esc(p.title)}">
+<meta property="og:description" content="${esc(p.description)}">
+<meta property="og:url" content="${SITE}/blog/${p.slug}.html">
+<meta property="og:image" content="${SITE}/assets/krish-kumar-og-card.jpg">
+<meta property="article:author" content="${esc(D.name)}">
+<meta property="article:published_time" content="${p.date}">
+${p.tags.map((t) => `<meta property="article:tag" content="${esc(t)}">`).join('\n')}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@${esc(D.handle)}">
+<meta name="twitter:title" content="${esc(p.title)}">
+<meta name="twitter:description" content="${esc(p.description)}">
+<meta name="twitter:image" content="${SITE}/assets/krish-kumar-og-card.jpg">
+<script type="application/ld+json">
+${JSON.stringify(jsonld, null, 2)}
+</script>
+<style>${PAGE_CSS}</style>
+</head>
+<body>
+${NAV}
+<article>
+  <h1>${esc(p.title)}</h1>
+  <p class="meta">
+    <time datetime="${p.date}">${new Date(p.date + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}</time>
+    · by <a href="${SITE}/">Krish Kumar</a>
+    <span class="tags"><br>${p.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</span>
+  </p>
+${p.body.trim()}
+</article>
+${FOOTER}
+</body>
+</html>
+`;
+}
+
+function buildBlogIndex() {
+  const items = POSTS.map((p) => `    <li>
+      <h2><a href="${p.slug}.html">${esc(p.title)}</a></h2>
+      <p class="when">${new Date(p.date + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}</p>
+      <p>${esc(p.description)}</p>
+    </li>`).join('\n');
+
+  const jsonld = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Krish Kumar — Writing',
+    url: `${SITE}/blog/`,
+    description: 'Engineering notes on applied LLM systems, agent architecture, correctness in money and data paths.',
+    author: { '@id': `${SITE}/#krish-kumar` },
+    blogPost: POSTS.map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.title,
+      url: `${SITE}/blog/${p.slug}.html`,
+      datePublished: p.date,
+      author: { '@id': `${SITE}/#krish-kumar` },
+    })),
+  };
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing — Krish Kumar (${esc(D.handle)}), AI Engineer</title>
+<meta name="description" content="Engineering notes by Krish Kumar (${esc(D.handle)}) — applied LLM systems, MCP servers, agent architecture, correctness in money and data paths.">
+<link rel="canonical" href="${SITE}/blog/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="${esc(D.name)}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Writing — Krish Kumar, AI Engineer">
+<meta property="og:description" content="Engineering notes on applied LLM systems, agent architecture and correctness in money and data paths.">
+<meta property="og:url" content="${SITE}/blog/">
+<meta property="og:image" content="${SITE}/assets/krish-kumar-og-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${SITE}/assets/krish-kumar-og-card.jpg">
+<script type="application/ld+json">
+${JSON.stringify(jsonld, null, 2)}
+</script>
+<style>${PAGE_CSS}</style>
+</head>
+<body>
+${NAV}
+<h1>Writing</h1>
+<p class="meta">Engineering notes by Krish Kumar — ${esc(D.jobTitle)}, ${esc(D.addressLocality)}.</p>
+<ul class="postlist">
+${items}
+</ul>
+${FOOTER}
+</body>
+</html>
+`;
+}
+
 // ── sitemap.xml ────────────────────────────────────────────────
 function buildSitemap() {
   const images = [
@@ -246,6 +435,18 @@ ${imgXml}
     </image:image>
   </url>
   <url>
+    <loc>${SITE}/blog/</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+${POSTS.map((p) => `  <url>
+    <loc>${SITE}/blog/${p.slug}.html</loc>
+    <lastmod>${p.date}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('\n')}
+  <url>
     <loc>${SITE}/assets/Krish_Kumar_Resume.pdf</loc>
     <lastmod>${TODAY}</lastmod>
     <changefreq>monthly</changefreq>
@@ -255,9 +456,15 @@ ${imgXml}
 `;
 }
 
+const blogDir = path.join(__dirname, 'blog');
+fs.mkdirSync(blogDir, { recursive: true });
+
 fs.writeFileSync(path.join(__dirname, 'resume.html'), buildResume(), 'utf8');
+fs.writeFileSync(path.join(blogDir, 'index.html'), buildBlogIndex(), 'utf8');
+POSTS.forEach((p) => fs.writeFileSync(path.join(blogDir, `${p.slug}.html`), buildPost(p), 'utf8'));
 fs.writeFileSync(path.join(__dirname, 'sitemap.xml'), buildSitemap(), 'utf8');
 
 console.log(`resume.html   ${D.experience.length} roles, ${D.projects.length} projects, ${D.skills.length} skill groups`);
-console.log(`sitemap.xml   3 urls, 5 images`);
+POSTS.forEach((p) => console.log(`blog          ${p.slug}.html  (${p.date})`));
+console.log(`sitemap.xml   ${4 + POSTS.length} urls, 5 images`);
 console.log(`sameAs        ${socials.length} profiles: ${socials.map((s) => s.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]).join(', ')}`);
