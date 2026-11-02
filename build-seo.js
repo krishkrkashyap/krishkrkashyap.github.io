@@ -22,6 +22,7 @@ const POSTS = new Function(
 
 const SITE = D.siteUrl.replace(/\/$/, '');
 const TODAY = new Date().toISOString().slice(0, 10);
+const NL = String.fromCharCode(10);
 
 const esc = (s) =>
   String(s == null ? '' : s)
@@ -255,6 +256,7 @@ const PAGE_CSS = `
 const NAV = `<nav>
   <a href="${SITE}/">Krish Kumar</a>
   <a href="${SITE}/blog/">Writing</a>
+  <a href="${SITE}/photos.html">Photos</a>
   <a href="${SITE}/resume.html">Résumé</a>
   <a href="${D.contact.github}">GitHub</a>
   <a href="${D.contact.linkedin}">LinkedIn</a>
@@ -398,6 +400,82 @@ ${FOOTER}
 `;
 }
 
+// ── photos.html ────────────────────────────────────────────────
+const PHOTOS = JSON.parse(fs.readFileSync(path.join(__dirname, 'photos.json'), 'utf8'));
+
+function buildPhotos() {
+  const jsonld = {
+    '@context': 'https://schema.org',
+    '@type': 'ImageGallery',
+    name: `Photos of ${D.name} (${D.handle}) — ${D.jobTitle}`,
+    url: `${SITE}/photos.html`,
+    description: `Photographs of ${D.name}, also known as ${D.handle}, ${D.jobTitle} based in ${D.addressLocality}, ${D.addressRegion}, India.`,
+    about: { '@id': `${SITE}/#krish-kumar` },
+    author: { '@id': `${SITE}/#krish-kumar` },
+    associatedMedia: PHOTOS.map((p) => ({
+      '@type': 'ImageObject',
+      contentUrl: `${SITE}/assets/${p.file}`,
+      url: `${SITE}/assets/${p.file}`,
+      width: p.w,
+      height: p.h,
+      name: p.alt,
+      caption: p.alt,
+      description: p.alt,
+      representativeOfPage: p.file === PHOTOS[0].file,
+      about: { '@id': `${SITE}/#krish-kumar` },
+      creditText: D.name,
+      copyrightNotice: `© ${D.name}`,
+    })),
+  };
+
+  const tiles = PHOTOS.map((p) => `    <figure>
+      <img src="assets/${esc(p.file)}" alt="${esc(p.alt)}" title="${esc(p.alt)}"
+           width="${p.w}" height="${p.h}" loading="lazy">
+      <figcaption>${esc(p.caption)} — Krish Kumar, AI Engineer</figcaption>
+    </figure>`).join('\n');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photos of ${esc(D.name)} (${esc(D.handle)}) — ${esc(D.jobTitle)}</title>
+<meta name="description" content="Photographs of ${esc(D.name)}, also known as ${esc(D.handle)} — ${esc(D.jobTitle)} based in ${esc(D.addressLocality)}, ${esc(D.addressRegion)}, India.">
+<link rel="canonical" href="${SITE}/photos.html">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="${esc(D.name)}">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Photos of ${esc(D.name)} (${esc(D.handle)})">
+<meta property="og:description" content="Photographs of ${esc(D.name)}, ${esc(D.jobTitle)} in ${esc(D.addressLocality)}, India.">
+<meta property="og:url" content="${SITE}/photos.html">
+<meta property="og:image" content="${SITE}/assets/${PHOTOS[0].file}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${SITE}/assets/${PHOTOS[0].file}">
+<script type="application/ld+json">
+${JSON.stringify(jsonld, null, 2)}
+</script>
+<style>${PAGE_CSS}
+  body { max-width: 1040px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:20px; }
+  figure { margin:0; }
+  figure img { width:100%; height:auto; border-radius:8px; display:block; border:1px solid var(--line); }
+  figcaption { font-size:.8rem; color:var(--dim); margin-top:7px; }
+</style>
+</head>
+<body>
+${NAV}
+<h1>Photos of Krish Kumar</h1>
+<p class="meta">Krish Kumar, also known as <strong>${esc(D.handle)}</strong> — ${esc(D.jobTitle)}
+based in ${esc(D.location)}. These are photographs of me; please credit if you use them.</p>
+<div class="grid">
+${tiles}
+</div>
+${FOOTER}
+</body>
+</html>
+`;
+}
+
 // ── sitemap.xml ────────────────────────────────────────────────
 function buildSitemap() {
   const images = [
@@ -435,6 +513,17 @@ ${imgXml}
     </image:image>
   </url>
   <url>
+    <loc>${SITE}/photos.html</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+${PHOTOS.map((p) => `    <image:image>
+      <image:loc>${SITE}/assets/${p.file}</image:loc>
+      <image:title>${esc(p.alt)}</image:title>
+      <image:caption>${esc(p.alt)}</image:caption>
+    </image:image>`).join(NL)}
+  </url>
+  <url>
     <loc>${SITE}/blog/</loc>
     <lastmod>${TODAY}</lastmod>
     <changefreq>weekly</changefreq>
@@ -462,9 +551,11 @@ fs.mkdirSync(blogDir, { recursive: true });
 fs.writeFileSync(path.join(__dirname, 'resume.html'), buildResume(), 'utf8');
 fs.writeFileSync(path.join(blogDir, 'index.html'), buildBlogIndex(), 'utf8');
 POSTS.forEach((p) => fs.writeFileSync(path.join(blogDir, `${p.slug}.html`), buildPost(p), 'utf8'));
+fs.writeFileSync(path.join(__dirname, 'photos.html'), buildPhotos(), 'utf8');
 fs.writeFileSync(path.join(__dirname, 'sitemap.xml'), buildSitemap(), 'utf8');
 
 console.log(`resume.html   ${D.experience.length} roles, ${D.projects.length} projects, ${D.skills.length} skill groups`);
 POSTS.forEach((p) => console.log(`blog          ${p.slug}.html  (${p.date})`));
-console.log(`sitemap.xml   ${4 + POSTS.length} urls, 5 images`);
+console.log(`photos.html   ${PHOTOS.length} images with ImageObject schema`);
+console.log(`sitemap.xml   ${5 + POSTS.length} urls, ${PHOTOS.length + 4} images`);
 console.log(`sameAs        ${socials.length} profiles: ${socials.map((s) => s.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]).join(', ')}`);
