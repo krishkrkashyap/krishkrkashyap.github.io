@@ -373,6 +373,7 @@ function buildBlogIndex() {
 <title>Writing — Krish Kumar (${esc(D.handle)}), AI Engineer</title>
 <meta name="description" content="Engineering notes by Krish Kumar (${esc(D.handle)}) — applied LLM systems, MCP servers, agent architecture, correctness in money and data paths.">
 <link rel="canonical" href="${SITE}/blog/">
+<link rel="alternate" type="application/atom+xml" title="Krish Kumar — Engineering writing" href="${SITE}/feed.xml">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="author" content="${esc(D.name)}">
 <meta property="og:type" content="website">
@@ -476,6 +477,36 @@ ${FOOTER}
 `;
 }
 
+// ── feed.xml (Atom) ───────────────────────────────────────────
+function buildFeed() {
+  const updated = new Date(POSTS[0].date + 'T00:00:00Z').toISOString();
+  const entries = POSTS.map((p) => `  <entry>
+    <title>${esc(p.title)}</title>
+    <link href="${SITE}/blog/${p.slug}.html"/>
+    <id>${SITE}/blog/${p.slug}.html</id>
+    <updated>${new Date(p.date + 'T00:00:00Z').toISOString()}</updated>
+    <summary>${esc(p.description)}</summary>
+${p.tags.map((t) => `    <category term="${esc(t)}"/>`).join(NL)}
+  </entry>`).join(NL);
+
+  return `<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>${esc(D.name)} — Engineering writing</title>
+  <subtitle>Notes on applied LLM systems, agent architecture and correctness in money and data paths.</subtitle>
+  <link href="${SITE}/feed.xml" rel="self"/>
+  <link href="${SITE}/blog/"/>
+  <id>${SITE}/</id>
+  <updated>${updated}</updated>
+  <author>
+    <name>${esc(D.name)}</name>
+    <uri>${SITE}/</uri>
+    <email>${esc(D.contact.email)}</email>
+  </author>
+${entries}
+</feed>
+`;
+}
+
 // ── sitemap.xml ────────────────────────────────────────────────
 function buildSitemap() {
   const images = [
@@ -552,10 +583,12 @@ fs.writeFileSync(path.join(__dirname, 'resume.html'), buildResume(), 'utf8');
 fs.writeFileSync(path.join(blogDir, 'index.html'), buildBlogIndex(), 'utf8');
 POSTS.forEach((p) => fs.writeFileSync(path.join(blogDir, `${p.slug}.html`), buildPost(p), 'utf8'));
 fs.writeFileSync(path.join(__dirname, 'photos.html'), buildPhotos(), 'utf8');
+fs.writeFileSync(path.join(__dirname, 'feed.xml'), buildFeed(), 'utf8');
 fs.writeFileSync(path.join(__dirname, 'sitemap.xml'), buildSitemap(), 'utf8');
 
 console.log(`resume.html   ${D.experience.length} roles, ${D.projects.length} projects, ${D.skills.length} skill groups`);
 POSTS.forEach((p) => console.log(`blog          ${p.slug}.html  (${p.date})`));
 console.log(`photos.html   ${PHOTOS.length} images with ImageObject schema`);
+console.log(`feed.xml      Atom feed, ${POSTS.length} entries`);
 console.log(`sitemap.xml   ${5 + POSTS.length} urls, ${PHOTOS.length + 4} images`);
 console.log(`sameAs        ${socials.length} profiles: ${socials.map((s) => s.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]).join(', ')}`);
