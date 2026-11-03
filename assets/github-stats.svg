@@ -24,7 +24,7 @@
   <line class="rule" x1="268" y1="58" x2="268" y2="173"/>
 
     <text x="26" y="74" class="label">Contributions (1y)</text>
-    <text x="250" y="74" class="value" text-anchor="end">3,531</text>
+    <text x="250" y="74" class="value" text-anchor="end">3,534</text>
     <text x="26" y="100" class="label">Active days</text>
     <text x="250" y="100" class="value" text-anchor="end">288 / 367</text>
     <text x="26" y="126" class="label">Longest streak</text>
