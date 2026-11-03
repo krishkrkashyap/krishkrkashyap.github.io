@@ -72,7 +72,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const n = (x) => x.toLocaleString('en-US');
 
 function svg({ c, p, langs }) {
-  const W = 495, H = 195;
+  const W = 495, H = 215;
   const LANG_COLORS = {
     Python: '#3572A5', JavaScript: '#f1e05a', TypeScript: '#3178c6', HTML: '#e34c26',
     CSS: '#563d7c', Java: '#b07219', Kotlin: '#A97BFF', Jupyter: '#DA5B0B',
@@ -84,6 +84,7 @@ function svg({ c, p, langs }) {
     ['Contributions (1y)', n(c.total)],
     ['Active days', `${c.active} / ${c.days}`],
     ['Longest streak', `${c.longest} days`],
+    ['Current streak', `${c.current} days`],
     ['Public repos', n(p.repos)],
   ];
 
@@ -132,7 +133,7 @@ function svg({ c, p, langs }) {
   <text x="26" y="48" class="sub">AI Engineer · Ahmedabad, India · on GitHub since ${p.since}</text>
   <line class="rule" x1="268" y1="58" x2="268" y2="${H - 22}"/>
 ${rows}
-  <text x="285" y="54" class="label">Most-used languages</text>
+  <text x="285" y="54" class="label">Languages (public repos)</text>
 ${bar}
 ${legend}
 </svg>
