@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Krish Kumar — Engineering writing</title>
+  <subtitle>Notes on applied LLM systems, agent architecture and correctness in money and data paths.</subtitle>
+  <link href="https://krishkrkashyap.github.io/feed.xml" rel="self"/>
+  <link href="https://krishkrkashyap.github.io/blog/"/>
+  <id>https://krishkrkashyap.github.io/</id>
+  <updated>2026-10-12T00:00:00.000Z</updated>
+  <author>
+    <name>Krish Kumar</name>
+    <uri>https://krishkrkashyap.github.io/</uri>
+    <email>krishkrkashyap@gmail.com</email>
+  </author>
+  <entry>
+    <title>Never store money in a float: integer paise and basis-point taxes</title>
+    <link href="https://krishkrkashyap.github.io/blog/money-in-integer-paise.html"/>
+    <id>https://krishkrkashyap.github.io/blog/money-in-integer-paise.html</id>
+    <updated>2026-10-12T00:00:00.000Z</updated>
+    <summary>Why a restaurant POS stores every amount as an integer number of paise, why tax rates are basis points rather than percentages, and the rounding rule that keeps a printed bill reconciling with the ledger.</summary>
+    <category term="money"/>
+    <category term="typescript"/>
+    <category term="pos"/>
+    <category term="correctness"/>
+    <category term="rounding"/>
+  </entry>
+  <entry>
+    <title>Putting a Model Context Protocol server over a commercial POS</title>
+    <link href="https://krishkrkashyap.github.io/blog/mcp-server-over-a-pos.html"/>
+    <id>https://krishkrkashyap.github.io/blog/mcp-server-over-a-pos.html</id>
+    <updated>2026-09-28T00:00:00.000Z</updated>
+    <summary>How exposing a point-of-sale platform as schema-validated MCP tools replaced a drawer full of one-off analysis scripts, and what the tool boundary has to look like for a model to use it safely.</summary>
+    <category term="mcp"/>
+    <category term="llm"/>
+    <category term="ai-agents"/>
+    <category term="python"/>
+    <category term="pos"/>
+  </entry>
+  <entry>
+    <title>A margin audit, and the leak that was not in the data</title>
+    <link href="https://krishkrkashyap.github.io/blog/the-leak-that-was-not-in-the-data.html"/>
+    <id>https://krishkrkashyap.github.io/blog/the-leak-that-was-not-in-the-data.html</id>
+    <updated>2026-09-05T00:00:00.000Z</updated>
+    <summary>A year of restaurant transaction data through a staged pandas pipeline. The price integrity was high, the discounting was clean, and the real finding was a category of transaction that no control was watching at all.</summary>
+    <category term="data-engineering"/>
+    <category term="pandas"/>
+    <category term="forensics"/>
+    <category term="audit"/>
+    <category term="parquet"/>
+  </entry>
+</feed>
