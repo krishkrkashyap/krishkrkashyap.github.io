@@ -24,13 +24,13 @@
   <line class="rule" x1="268" y1="58" x2="268" y2="193"/>
 
     <text x="26" y="74" class="label">Contributions (1y)</text>
-    <text x="250" y="74" class="value" text-anchor="end">3,552</text>
+    <text x="250" y="74" class="value" text-anchor="end">3,515</text>
     <text x="26" y="100" class="label">Active days</text>
-    <text x="250" y="100" class="value" text-anchor="end">291 / 371</text>
+    <text x="250" y="100" class="value" text-anchor="end">288 / 365</text>
     <text x="26" y="126" class="label">Longest streak</text>
-    <text x="250" y="126" class="value" text-anchor="end">44 days</text>
+    <text x="250" y="126" class="value" text-anchor="end">43 days</text>
     <text x="26" y="152" class="label">Current streak</text>
-    <text x="250" y="152" class="value" text-anchor="end">0 days</text>
+    <text x="250" y="152" class="value" text-anchor="end">7 days</text>
     <text x="26" y="178" class="label">Public repos</text>
     <text x="250" y="178" class="value" text-anchor="end">16</text>
   <text x="285" y="54" class="label">Languages (public repos)</text>
